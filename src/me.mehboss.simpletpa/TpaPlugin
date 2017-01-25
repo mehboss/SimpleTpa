@@ -1,0 +1,25 @@
+package me.mehboss.simpletpa;
+
+import java.util.HashMap;
+
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class TpaPlugin extends JavaPlugin {
+
+	HashMap<Player, Player> tpa = new HashMap<Player, Player>();
+    
+	public void onEnable() {
+		getCommand("tpa").setExecutor(new Tpa(this));
+		getCommand("tpaccept").setExecutor(new Tpaccept(this));
+		getCommand("tpdeny").setExecutor(new Tpdeny(this));
+		getCommand("tpamessage").setExecutor(new TestMessage(this));
+		registerConfig();
+	}
+
+	private void registerConfig() {
+		getConfig().options().copyDefaults(true);
+		saveConfig();
+		getLogger();
+	}
+}
