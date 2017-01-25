@@ -1,0 +1,48 @@
+package me.mehboss.simpletpa;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+public class Tpdeny implements CommandExecutor {
+
+	private TpaPlugin plugin;
+
+	public Tpdeny(TpaPlugin plugin) {
+		this.plugin = plugin;
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+		Player requester = (Player) sender;
+        String denied = ChatColor.translateAlternateColorCodes('&', "&cdenied&r");
+        String PlayerRespondsRequest = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("TPA-Request.Player-Denies-Request"));
+        String PlayerRespondedRequest = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("TPA-Request.Player-Denied-Request"));
+        String noPending = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("Other-Messages.noPending"));
+        String Prefix = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("Prefix"));
+        String noPerm = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("Other-Messages.noPerm"));
+        
+		if (cmd.getName().equalsIgnoreCase("tpdeny")) {
+			if (!sender.hasPermission("simpletpa.tpdeny")) {
+				sender.sendMessage(Prefix + noPerm);
+				return false;
+			}
+			if (plugin.tpa.get(requester) != null) {
+				requester.sendMessage(Prefix + PlayerRespondsRequest.replaceAll("%REQUEST%", denied.toString()));
+				plugin.tpa.get(requester).sendMessage(Prefix + PlayerRespondedRequest.replaceAll("%REQUEST%", denied.toString()));
+				plugin.tpa.put(requester, null);
+			} else {
+				requester.sendMessage(Prefix + noPending);
+			}
+		}
+		return false;
+	}
+}
