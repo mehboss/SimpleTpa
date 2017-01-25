@@ -1,0 +1,48 @@
+package me.mehboss.simpletpa;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+public class TestMessage implements CommandExecutor {
+
+	private TpaPlugin plugin;
+
+	public TestMessage(TpaPlugin plugin) {
+		this.plugin = plugin;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+		Player requester = (Player) sender;
+        Plugin config = Bukkit.getPluginManager().getPlugin("SimpleTpa");
+        
+		String Usage = ChatColor.translateAlternateColorCodes('&',
+				config.getConfig().getString("Other-Messages.Usage"));
+		String Prefix = ChatColor.translateAlternateColorCodes('&',
+				config.getConfig().getString("Prefix"));
+		String noPerm = ChatColor.translateAlternateColorCodes('&',
+				config.getConfig().getString("Other-Messages.noPerm"));
+
+		if (cmd.getName().equalsIgnoreCase("tpamessage")) {
+				if (!sender.hasPermission("simpletpa.test")) {
+					sender.sendMessage(Prefix + noPerm);
+					return false;
+				}
+				if (args.length == 0) {
+					for (String tpamessage : Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig()
+							.getStringList("TP-Message")) {
+						requester.sendMessage(tpamessage.replaceAll("(&([a-fk-o0-9]))", "\u00A7$2"));
+					}
+				}
+				else {
+					requester.sendMessage(Usage);
+				}
+			}
+		return false;
+	}
+}
