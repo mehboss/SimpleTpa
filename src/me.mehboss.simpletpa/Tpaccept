@@ -1,0 +1,49 @@
+package me.mehboss.simpletpa;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+public class Tpaccept implements CommandExecutor {
+
+	private TpaPlugin plugin;
+
+	public Tpaccept(TpaPlugin plugin) {
+		this.plugin = plugin;
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+		Player requester = (Player) sender;
+        String accepted = ChatColor.translateAlternateColorCodes('&', "&aaccepted&r");
+        String PlayerRespondsRequest = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("TPA-Request.Player-Denies-Request"));
+        String PlayerRespondedRequest = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("TPA-Request.Player-Denied-Request"));
+        String noPending = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("Other-Messages.noPending"));
+        String Prefix = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("Prefix"));
+        String noPerm = ChatColor.translateAlternateColorCodes('&',
+    			Bukkit.getPluginManager().getPlugin("SimpleTpa").getConfig().getString("Other-Messages.noPerm"));
+        
+		if (cmd.getName().equalsIgnoreCase("tpaccept")) {
+			if (!sender.hasPermission("simpletpa.tpaccept")) {
+				sender.sendMessage(Prefix + noPerm);
+				return false;
+			}
+			if (plugin.tpa.get(requester) != null) {
+				requester.sendMessage(Prefix + PlayerRespondsRequest.replaceAll("%REQUEST%", accepted.toString()));
+				plugin.tpa.get(requester).sendMessage(Prefix + PlayerRespondedRequest.replaceAll("%REQUEST%", accepted.toString()));
+				plugin.tpa.get(requester).teleport(requester);
+				plugin.tpa.put(requester, null);
+			} else {
+				requester.sendMessage(Prefix + noPending);
+			}
+		}
+		return false;
+	}
+}
